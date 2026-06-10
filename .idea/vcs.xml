@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/../.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../AndromedaCommon" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../AndromedaDSP" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../AndromedaSpectrumAnalyzer" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../GradientForge" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../KissFFT" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../LCDDisplayWidget" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../ModPlugPlayerAPI" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../PlayListWidget" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../SpectraAnimator" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../SpectraBandForge" vcs="Git" />
+  </component>
+</project>
