@@ -16,6 +16,9 @@ file(GLOB AndromedaEntanglementSrc
     "src/*.hpp"
     "src/*.cpp"
     "src/*.mm"
+    "src/Utils/*.hpp"
+    "src/Utils/*.cpp"
+    "src/Utils/*.mm"
 )
 
 if(Boost_FOUND)

@@ -13,124 +13,11 @@ You should have received a copy of the GNU Lesser General Public License along w
 #include <optional>
 
 #include "FileAssociationManager.hpp"
+#include "Utils/MacFileAssociationUtil.hpp"
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 #import <CoreServices/CoreServices.h>
-
-static std::string
-queryDescription(
-    CFStringRef uti)
-{
-    CFDictionaryRef declaration =
-        UTTypeCopyDeclaration(uti);
-
-    if (!declaration)
-    {
-        return {};
-    }
-
-    std::string result;
-
-    CFStringRef description =
-        (CFStringRef)
-        CFDictionaryGetValue(
-            declaration,
-            kUTTypeDescriptionKey);
-
-    if (description)
-    {
-        result =
-            [(NSString*)description UTF8String];
-    }
-
-    CFRelease(declaration);
-
-    return result;
-}
-
-static std::optional<Andromeda::Entanglement::IconInfo>
-queryDocumentIcon(
-    NSBundle* appBundle,
-    NSString* extension)
-{
-    NSArray* documentTypes =
-        [appBundle objectForInfoDictionaryKey:
-            @"CFBundleDocumentTypes"];
-
-    if (!documentTypes)
-    {
-        return std::nullopt;
-    }
-
-    for (NSDictionary* documentType in documentTypes)
-    {
-        NSArray* extensions =
-            documentType[@"CFBundleTypeExtensions"];
-
-        if (!extensions)
-        {
-            continue;
-        }
-
-        BOOL matches = NO;
-
-        for (NSString* currentExtension in extensions)
-        {
-            if ([currentExtension
-                    caseInsensitiveCompare:extension]
-                == NSOrderedSame)
-            {
-                matches = YES;
-                break;
-            }
-        }
-
-        if (!matches)
-        {
-            continue;
-        }
-
-        NSString* iconFile =
-            documentType[@"CFBundleTypeIconFile"];
-
-        if (!iconFile)
-        {
-            continue;
-        }
-
-        if (![iconFile.pathExtension length])
-        {
-            iconFile =
-                [iconFile stringByAppendingString:@".icns"];
-        }
-
-        NSString* resourcesPath =
-            [appBundle resourcePath];
-
-        NSString* iconPath =
-            [resourcesPath
-                stringByAppendingPathComponent:
-                    iconFile];
-
-        Andromeda::Entanglement::IconInfo iconInfo;
-
-        iconInfo.iconSource =
-            Andromeda::Entanglement::IconSource::FilePath;
-
-        iconInfo.iconName =
-            std::string(
-                [iconFile UTF8String]);
-
-        iconInfo.iconPath =
-            std::string(
-                [iconPath UTF8String]);
-
-        return iconInfo;
-    }
-
-    return std::nullopt;
-}
 
 std::vector<Andromeda::Entanglement::FileAssociation>
 Andromeda::Entanglement::FileAssociationManager::queryAssociations(
@@ -177,7 +64,7 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
         // Description
         //
         auto description =
-            queryDescription(uti);
+            MacFileAssociationUtil::queryDescription(uti);
 
         if (!description.empty())
         {
@@ -257,7 +144,7 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
                 // Document icon from Info.plist
                 //
                 auto documentIcon =
-                    queryDocumentIcon(
+                    MacFileAssociationUtil::queryDocumentIcon(
                         appBundle,
                         nsExt);
 
