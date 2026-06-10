@@ -21,7 +21,6 @@ namespace Andromeda::Entanglement {
         std::string uti;
         MacRole role = MacRole::Unknown;
         std::string bundleIdentifier;
-        std::string launchServicesIdentifier;
     };
 
     struct WindowsAssociationDetails

@@ -8,6 +8,37 @@
 #import <AppKit/AppKit.h>
 #import <CoreServices/CoreServices.h>
 
+static std::string
+queryDescription(
+    CFStringRef uti)
+{
+    CFDictionaryRef declaration =
+        UTTypeCopyDeclaration(uti);
+
+    if (!declaration)
+    {
+        return {};
+    }
+
+    std::string result;
+
+    CFStringRef description =
+        (CFStringRef)
+        CFDictionaryGetValue(
+            declaration,
+            kUTTypeDescriptionKey);
+
+    if (description)
+    {
+        result =
+            [(NSString*)description UTF8String];
+    }
+
+    CFRelease(declaration);
+
+    return result;
+}
+
 static std::optional<Andromeda::Entanglement::IconInfo>
 queryDocumentIcon(
     NSBundle* appBundle,
@@ -95,7 +126,7 @@ std::vector<Andromeda::Entanglement::FileAssociation>
 Andromeda::Entanglement::FileAssociationManager::queryAssociations(
     const std::vector<std::string>& extensions)
 {
-    std::vector<Andromeda::Entanglement::FileAssociation> result;
+    std::vector<FileAssociation> result;
 
     NSString* currentBundleId =
         [[NSBundle mainBundle] bundleIdentifier];
@@ -105,7 +136,7 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
 
     for (const auto& ext : extensions)
     {
-        Andromeda::Entanglement::FileAssociation association;
+        FileAssociation association;
 
         association.fileTypeInfo.extension = ext;
 
@@ -133,6 +164,23 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
             [(NSString*)uti UTF8String];
 
         //
+        // Description
+        //
+        auto description =
+            queryDescription(uti);
+
+        if (!description.empty())
+        {
+            association.fileTypeInfo.description =
+                std::move(description);
+        }
+        else
+        {
+            association.fileTypeInfo.description =
+                [(NSString*)uti UTF8String];
+        }
+
+        //
         // MIME Type
         //
         CFStringRef mimeType =
@@ -147,12 +195,6 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
 
             CFRelease(mimeType);
         }
-
-        //
-        // Description (temporary)
-        //
-        association.fileTypeInfo.description =
-            [(NSString*)uti UTF8String];
 
         //
         // Default handler
@@ -173,12 +215,11 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
                 [handlerBundleId UTF8String];
 
             association.macDetails->role =
-                Andromeda::Entanglement::MacRole::All;
+                MacRole::All;
 
             association.handledByCurrentApplication =
-                [handlerBundleId
-                    isEqualToString:
-                        currentBundleId];
+                [handlerBundleId isEqualToString:
+                    currentBundleId];
 
             NSURL* appUrl =
                 [workspace
@@ -203,7 +244,7 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
                 }
 
                 //
-                // Try document icon first
+                // Document icon from Info.plist
                 //
                 auto documentIcon =
                     queryDocumentIcon(
@@ -218,7 +259,7 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
                 else
                 {
                     //
-                    // Fallback icon
+                    // Fallback icon from NSWorkspace
                     //
                     NSImage* icon =
                         [workspace
@@ -228,7 +269,7 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
                     if (icon)
                     {
                         association.fileTypeInfo.iconInfo.iconSource =
-                            Andromeda::Entanglement::IconSource::BinaryData;
+                            IconSource::BinaryData;
 
                         NSData* tiffData =
                             [icon TIFFRepresentation];
