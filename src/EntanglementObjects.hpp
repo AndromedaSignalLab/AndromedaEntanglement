@@ -20,13 +20,13 @@ namespace Andromeda::Entanglement {
         Editor,
         Shell,
         All,
-        Unknown
+        None
     };
 
     struct MacAssociationDetails
     {
         std::string uti;
-        MacRole role = MacRole::Unknown;
+        MacRole role = MacRole::None;
         std::string bundleIdentifier;
     };
 

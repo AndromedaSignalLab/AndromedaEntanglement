@@ -10,8 +10,5 @@ You should have received a copy of the GNU Lesser General Public License along w
 */
 #include "FileAssociationManager.hpp"
 
-bool Andromeda::Entanglement::FileAssociationManager::associate(const FileAssociation& fileAssociation) {
-}
-
 bool Andromeda::Entanglement::FileAssociationManager::unassociate(const std::string &extension) {
 }
