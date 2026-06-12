@@ -25,7 +25,7 @@ namespace Andromeda::Entanglement {
         static std::string queryDescription(CFStringRef uti);
         static std::optional<IconInfo> queryDocumentIcon(NSBundle* appBundle, NSString* extension);
         static NSString* currentBundleIdentifier();
-        static LSRolesMask macRole2LsRoleMask(const MacRole &macRole);
-        static MacRole lsRoleMask2macRole(const LSRolesMask &lsRoleMask);
+        static LSRolesMask macAssociationRoles2LsRoleMask(const MacAssociationRoles &roles);
+        static MacAssociationRoles lsRoleMask2macAssociationRoles(const LSRolesMask &lsRoleMask);
     };
 }

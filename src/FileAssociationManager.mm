@@ -111,8 +111,7 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
             association.macDetails->bundleIdentifier =
                 [handlerBundleId UTF8String];
 
-            association.macDetails->role =
-                MacRole::All;
+            association.macDetails->roles.viewer = true;
 
             association.handledByCurrentApplication =
                 [handlerBundleId isEqualToString:
@@ -230,7 +229,7 @@ NSString* bundleIdentifier =
                 ->uti
                 .c_str()];
 
-    LSRolesMask roleMask = MacFileAssociationUtil::macRole2LsRoleMask(fileAssociation.macDetails->role);
+    LSRolesMask roleMask = MacFileAssociationUtil::macAssociationRoles2LsRoleMask(fileAssociation.macDetails->roles);
 
     //https://github.com/ghostty-org/ghostty/discussions/8111
     //https://developer.apple.com/documentation/appkit/nsworkspace/setdefaultapplication(at:toopen:completion:)

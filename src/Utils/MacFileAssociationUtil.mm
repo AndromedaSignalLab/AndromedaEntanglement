@@ -125,46 +125,44 @@ NSString* Andromeda::Entanglement::MacFileAssociationUtil::currentBundleIdentifi
         bundleIdentifier];
 }
 
-Andromeda::Entanglement::MacRole Andromeda::Entanglement::MacFileAssociationUtil::lsRoleMask2macRole(const LSRolesMask &lsRoleMask) {
-    MacRole macRole;
-    switch (lsRoleMask) {
-        case kLSRolesViewer:
-            macRole = MacRole::Viewer;
-            break;
-        case kLSRolesEditor:
-            macRole = MacRole::Editor;
-            break;
-        case kLSRolesShell:
-            macRole = MacRole::Shell;
-            break;
-        case kLSRolesAll:
-            macRole = MacRole::All;
-            break;
-        case kLSRolesNone:
-            macRole = MacRole::None;
-            break;
-    }
-    return macRole;
+Andromeda::Entanglement::MacAssociationRoles Andromeda::Entanglement::MacFileAssociationUtil::lsRoleMask2macAssociationRoles(const LSRolesMask &lsRoleMask) {
+    MacAssociationRoles roles;
+
+    if(lsRoleMask & kLSRolesViewer)
+        roles.viewer = true;
+
+    if (lsRoleMask & kLSRolesEditor)
+            roles.editor = true;
+
+    if (lsRoleMask & kLSRolesShell)
+        roles.shell = true;
+    /*
+    if (lsRoleMask & kLSRolesAll)
+        roles.all = true;
+
+    if (lsRoleMask & kLSRolesNone)
+        roles.none = true;
+    */
+    return roles;
 }
 
-LSRolesMask Andromeda::Entanglement::MacFileAssociationUtil::macRole2LsRoleMask(const MacRole &macRole) {
-    LSRolesMask roleMask;
-    switch (macRole) {
-        case MacRole::Viewer:
-            roleMask = kLSRolesViewer;
-            break;
-        case MacRole::Editor:
-            roleMask = kLSRolesEditor;
-            break;
-        case MacRole::Shell:
-            roleMask = kLSRolesShell;
-            break;
-        case MacRole::All:
-            roleMask = kLSRolesAll;
-            break;
-        case MacRole::None:
-            roleMask = kLSRolesNone;
-            break;
-    }
+LSRolesMask Andromeda::Entanglement::MacFileAssociationUtil::macAssociationRoles2LsRoleMask(const MacAssociationRoles &roles) {
+    LSRolesMask roleMask = 0;
+
+    if (roles.viewer)
+        roleMask |= kLSRolesViewer;
+
+    if (roles.editor)
+        roleMask |= kLSRolesEditor;
+
+    if (roles.shell)
+        roleMask |= kLSRolesShell;
+    /*
+    if (roles.all)
+        roleMask |= kLSRolesAll;
+
+    if (roles.none)
+        roleMask |= kLSRolesNone;
+    */
     return roleMask;
 }

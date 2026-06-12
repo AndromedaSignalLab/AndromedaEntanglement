@@ -15,18 +15,18 @@ You should have received a copy of the GNU Lesser General Public License along w
 #include <cstddef>
 
 namespace Andromeda::Entanglement {
-    enum class MacRole {
-        Viewer,
-        Editor,
-        Shell,
-        All,
-        None
+    struct MacAssociationRoles {
+        bool viewer = false;
+        bool editor = false;
+        bool shell = false;
+        //bool all = false;
+        //bool none = false;
     };
 
     struct MacAssociationDetails
     {
         std::string uti;
-        MacRole role = MacRole::None;
+        MacAssociationRoles roles;
         std::string bundleIdentifier;
     };
 
