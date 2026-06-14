@@ -17,6 +17,10 @@ namespace Andromeda::Entanglement {
     public:
         std::vector<FileAssociation> queryAssociations(const std::vector<std::string>& extensions);
 
+        std::vector<FileAssociation> queryAssociations(const std::vector<std::string>& extensions, const MacAssociationRole &macAssociationRole);
+
+        FileAssociation queryAssociation(const std::string& extension, const MacAssociationRole &macAssociationRole);
+
         bool associate(const FileAssociation& fileAssociation);
 
         bool unassociate(const std::string& extension);

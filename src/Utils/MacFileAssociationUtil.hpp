@@ -30,5 +30,6 @@ namespace Andromeda::Entanglement {
         static MacAssociationRoles lsRoleMask2macAssociationRoles(const LSRolesMask &lsRoleMask);
         static MacAssociationRole lsRoleMask2macAssociationRole(const LSRolesMask &lsRoleMask);
         static LSRolesMask macAssociationRole2LsRoleMask(const MacAssociationRole &macAssociationRole);
+        static MacAssociationRole queryRoleFromBundle(NSBundle* appBundle, NSString* extension, CFStringRef uti);
     };
 }

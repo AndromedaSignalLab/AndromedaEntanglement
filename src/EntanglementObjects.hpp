@@ -24,7 +24,7 @@ namespace Andromeda::Entanglement {
     };
 
     enum class MacAssociationRole : unsigned int {
-        //None = 0x00000001,
+        None = 0x00000001,
         Viewer = 0x00000002,
         Editor = 0x00000004,
         Shell = 0x00000008,
@@ -34,7 +34,7 @@ namespace Andromeda::Entanglement {
     struct MacAssociationDetails
     {
         std::string uti;
-        MacAssociationRoles roles;
+        MacAssociationRole associationRole;
         std::string bundleIdentifier;
     };
 

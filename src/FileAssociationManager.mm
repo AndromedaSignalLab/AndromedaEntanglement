@@ -111,7 +111,187 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
             association.macDetails->bundleIdentifier =
                 [handlerBundleId UTF8String];
 
-            association.macDetails->roles.viewer = true;
+            association.handledByCurrentApplication =
+                [handlerBundleId isEqualToString:
+                    currentBundleId];
+
+            NSURL* appUrl =
+                [workspace
+                    URLForApplicationWithBundleIdentifier:
+                        handlerBundleId];
+
+            if (appUrl)
+            {
+                NSBundle* appBundle =
+                    [NSBundle bundleWithURL:
+                        appUrl];
+
+                NSString* appName =
+                    [appBundle
+                        objectForInfoDictionaryKey:
+                            @"CFBundleName"];
+
+                if (appName)
+                {
+                    association.applicationInfo.applicationName =
+                        [appName UTF8String];
+                }
+
+                //
+                // Document icon from Info.plist
+                //
+                auto documentIcon =
+                    MacFileAssociationUtil::queryDocumentIcon(
+                        appBundle,
+                        nsExt);
+
+                if (documentIcon)
+                {
+                    association.fileTypeInfo.iconInfo =
+                        *documentIcon;
+                }
+                else
+                {
+                    //
+                    // Fallback icon from NSWorkspace
+                    //
+                    NSImage* icon =
+                        [workspace
+                            iconForFileType:
+                                nsExt];
+
+                    if (icon)
+                    {
+                        association.fileTypeInfo.iconInfo.iconSource =
+                            IconSource::BinaryData;
+
+                        NSData* tiffData =
+                            [icon TIFFRepresentation];
+
+                        if (tiffData)
+                        {
+                            const std::byte* bytes =
+                                reinterpret_cast<
+                                    const std::byte*>(
+                                        [tiffData bytes]);
+
+                            association.fileTypeInfo
+                                .iconInfo
+                                .iconData
+                                .assign(
+                                    bytes,
+                                    bytes +
+                                    [tiffData length]);
+                        }
+                    }
+                }
+            }
+
+            CFRelease(handler);
+        }
+
+        CFRelease(uti);
+
+        result.push_back(
+            std::move(association));
+    }
+
+    return result;
+}
+
+std::vector<Andromeda::Entanglement::FileAssociation>
+Andromeda::Entanglement::FileAssociationManager::queryAssociations(
+    const std::vector<std::string>& extensions, const MacAssociationRole &macAssociationRole)
+{
+    std::vector<FileAssociation> result;
+
+    LSRolesMask roleMask = MacFileAssociationUtil::macAssociationRole2LsRoleMask(macAssociationRole);
+
+    NSString* currentBundleId =
+        [[NSBundle mainBundle] bundleIdentifier];
+
+    NSWorkspace* workspace =
+        [NSWorkspace sharedWorkspace];
+
+    for (const auto& ext : extensions)
+    {
+        FileAssociation association;
+
+        association.fileTypeInfo.extension = ext;
+
+        NSString* nsExt =
+            [NSString stringWithUTF8String:
+                ext.c_str()];
+
+        CFStringRef uti =
+            UTTypeCreatePreferredIdentifierForTag(
+                kUTTagClassFilenameExtension,
+                (__bridge CFStringRef)nsExt,
+                nullptr);
+
+        if (!uti)
+        {
+            result.push_back(
+                std::move(association));
+
+            continue;
+        }
+
+        association.macDetails.emplace();
+
+        association.macDetails->uti =
+            [(NSString*)uti UTF8String];
+
+        //
+        // Description
+        //
+        auto description =
+            MacFileAssociationUtil::queryDescription(uti);
+
+        if (!description.empty())
+        {
+            association.fileTypeInfo.description =
+                std::move(description);
+        }
+        else
+        {
+            association.fileTypeInfo.description =
+                [(NSString*)uti UTF8String];
+        }
+
+        //
+        // MIME Type
+        //
+        CFStringRef mimeType =
+            UTTypeCopyPreferredTagWithClass(
+                uti,
+                kUTTagClassMIMEType);
+
+        if (mimeType)
+        {
+            association.fileTypeInfo.mimeType =
+                [(NSString*)mimeType UTF8String];
+
+            CFRelease(mimeType);
+        }
+
+        //
+        // Default handler
+        //
+        CFStringRef handler =
+            LSCopyDefaultRoleHandlerForContentType(
+                uti,
+                roleMask);
+
+        if (handler)
+        {
+            association.associated = true;
+
+            NSString* handlerBundleId =
+                (__bridge NSString*)handler;
+
+            association.macDetails->bundleIdentifier =
+                [handlerBundleId UTF8String];
 
             association.handledByCurrentApplication =
                 [handlerBundleId isEqualToString:
@@ -201,6 +381,174 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
     return result;
 }
 
+Andromeda::Entanglement::FileAssociation
+Andromeda::Entanglement::FileAssociationManager::queryAssociation(const std::string& extension, const MacAssociationRole &macAssociationRole) {
+    LSRolesMask roleMask = MacFileAssociationUtil::macAssociationRole2LsRoleMask(macAssociationRole);
+
+    NSString* currentBundleId =
+        [[NSBundle mainBundle] bundleIdentifier];
+
+    NSWorkspace* workspace = [NSWorkspace sharedWorkspace];
+
+    FileAssociation association;
+
+    association.fileTypeInfo.extension = extension;
+
+    NSString* nsExt =
+        [NSString stringWithUTF8String:
+            extension.c_str()];
+
+    CFStringRef uti =
+        UTTypeCreatePreferredIdentifierForTag(
+            kUTTagClassFilenameExtension,
+            (__bridge CFStringRef)nsExt,
+            nullptr);
+
+    if (!uti)
+    {
+        return association;
+    }
+
+    CFStringRef handler =
+    LSCopyDefaultRoleHandlerForContentType(
+        uti,
+        roleMask);
+
+    if (handler) {
+        association.associated = true;
+        association.macDetails.emplace();
+        association.macDetails->uti = [(NSString*)uti UTF8String];
+
+        NSString* handlerBundleId =
+            (__bridge NSString*)handler;
+
+        association.macDetails->bundleIdentifier =
+            [handlerBundleId UTF8String];
+
+        association.handledByCurrentApplication =
+            [handlerBundleId isEqualToString:
+                currentBundleId];
+
+        NSURL* appUrl =
+            [workspace
+                URLForApplicationWithBundleIdentifier:
+                    handlerBundleId];
+
+        if (appUrl) {
+            NSBundle* appBundle =
+                [NSBundle bundleWithURL:
+                    appUrl];
+
+            NSString* appName =
+                [appBundle
+                    objectForInfoDictionaryKey:
+                        @"CFBundleName"];
+
+            if (appName) {
+                association.applicationInfo.applicationName =
+                    [appName UTF8String];
+            }
+
+            association.macDetails->associationRole = MacFileAssociationUtil::queryRoleFromBundle(appBundle, nsExt, uti);
+
+            if(association.macDetails->associationRole != macAssociationRole) {
+                association.associated = false;
+                association.macDetails.reset();
+                CFRelease(handler);
+                CFRelease(uti);
+                return association;
+            }
+
+            //
+            // Document icon from Info.plist
+            //
+            auto documentIcon =
+                MacFileAssociationUtil::queryDocumentIcon(
+                    appBundle,
+                    nsExt);
+
+            if (documentIcon)
+            {
+                association.fileTypeInfo.iconInfo =
+                    *documentIcon;
+            }
+            else
+            {
+                //
+                // Fallback icon from NSWorkspace
+                //
+                NSImage* icon =
+                    [workspace
+                        iconForFileType:
+                            nsExt];
+
+                if (icon)
+                {
+                    association.fileTypeInfo.iconInfo.iconSource =
+                        IconSource::BinaryData;
+
+                    NSData* tiffData =
+                        [icon TIFFRepresentation];
+
+                    if (tiffData)
+                    {
+                        const std::byte* bytes =
+                            reinterpret_cast<
+                                const std::byte*>(
+                                    [tiffData bytes]);
+
+                        association.fileTypeInfo
+                            .iconInfo
+                            .iconData
+                            .assign(
+                                bytes,
+                                bytes +
+                                [tiffData length]);
+                    }
+                }
+            }
+        }
+    }
+
+    //
+    // Description
+    //
+    auto description =
+        MacFileAssociationUtil::queryDescription(uti);
+
+    if (!description.empty())
+    {
+        association.fileTypeInfo.description =
+            std::move(description);
+    }
+    else
+    {
+        association.fileTypeInfo.description =
+            [(NSString*)uti UTF8String];
+    }
+
+    //
+    // MIME Type
+    //
+    CFStringRef mimeType =
+        UTTypeCopyPreferredTagWithClass(
+            uti,
+            kUTTagClassMIMEType);
+
+    if (mimeType)
+    {
+        association.fileTypeInfo.mimeType =
+            [(NSString*)mimeType UTF8String];
+
+        CFRelease(mimeType);
+    }
+
+
+        CFRelease(handler);
+        CFRelease(uti);
+        return association;
+ }
+
 bool Andromeda::Entanglement::FileAssociationManager::associate(const FileAssociation& fileAssociation) {
     if (!fileAssociation.macDetails)
     {
@@ -229,7 +577,7 @@ NSString* bundleIdentifier =
                 ->uti
                 .c_str()];
 
-    LSRolesMask roleMask = MacFileAssociationUtil::macAssociationRoles2LsRoleMask(fileAssociation.macDetails->roles);
+    LSRolesMask roleMask = MacFileAssociationUtil::macAssociationRole2LsRoleMask(fileAssociation.macDetails->associationRole);
 
     //https://github.com/ghostty-org/ghostty/discussions/8111
     //https://developer.apple.com/documentation/appkit/nsworkspace/setdefaultapplication(at:toopen:completion:)

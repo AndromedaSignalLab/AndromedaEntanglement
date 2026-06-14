@@ -214,3 +214,83 @@ LSRolesMask Andromeda::Entanglement::MacFileAssociationUtil::macAssociationRole2
     }
     return roleMask;
 }
+
+Andromeda::Entanglement::MacAssociationRole
+Andromeda::Entanglement::MacFileAssociationUtil::queryRoleFromBundle(
+    NSBundle* appBundle,
+    NSString* extension,
+    CFStringRef uti)
+{
+    MacAssociationRoles roles;
+
+    NSArray* documentTypes =
+        [appBundle objectForInfoDictionaryKey:
+            @"CFBundleDocumentTypes"];
+
+    if (!documentTypes)
+    {
+        return MacAssociationRole::None;
+    }
+
+    for (NSDictionary* documentType in documentTypes)
+    {
+        bool matched = false;
+
+        //
+        // Prefer UTI matching
+        //
+        NSArray* contentTypes =
+            documentType[@"LSItemContentTypes"];
+
+        if (contentTypes)
+        {
+            matched =
+                [contentTypes containsObject:
+                    (__bridge NSString*)uti];
+        }
+
+        //
+        // Fallback to extension matching
+        //
+        if (!matched)
+        {
+            NSArray* extensions =
+                documentType[@"CFBundleTypeExtensions"];
+
+            if (extensions)
+            {
+                matched =
+                    [extensions containsObject:
+                        extension];
+            }
+        }
+
+        if (!matched)
+        {
+            continue;
+        }
+
+        NSString* role =
+            documentType[@"CFBundleTypeRole"];
+
+        if (!role)
+        {
+            continue;
+        }
+
+        if ([role isEqualToString:@"Viewer"])
+        {
+            return MacAssociationRole::Viewer;
+        }
+        else if ([role isEqualToString:@"Editor"])
+        {
+            return MacAssociationRole::Editor;
+        }
+        else if ([role isEqualToString:@"Shell"])
+        {
+            return MacAssociationRole::Shell;
+        }
+    }
+
+    return MacAssociationRole::None;
+}
