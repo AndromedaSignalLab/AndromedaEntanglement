@@ -166,3 +166,51 @@ LSRolesMask Andromeda::Entanglement::MacFileAssociationUtil::macAssociationRoles
     */
     return roleMask;
 }
+
+Andromeda::Entanglement::MacAssociationRole Andromeda::Entanglement::MacFileAssociationUtil::lsRoleMask2macAssociationRole(const LSRolesMask &lsRoleMask) {
+    MacAssociationRole macAssociationRole;
+    switch (lsRoleMask) {
+        case kLSRolesViewer:
+            macAssociationRole = MacAssociationRole::Viewer;
+            break;
+        case kLSRolesEditor:
+            macAssociationRole = MacAssociationRole::Editor;
+            break;
+        case kLSRolesShell:
+            macAssociationRole = MacAssociationRole::Shell;
+            break;
+        /*
+        case kLSRolesAll:
+            macAssociationRole = MacAssociationRole::All;
+            break;
+        case kLSRolesNone:
+            macAssociationRole = MacAssociationRole::None;
+            break;
+        */
+    }
+    return macAssociationRole;
+}
+
+LSRolesMask Andromeda::Entanglement::MacFileAssociationUtil::macAssociationRole2LsRoleMask(const MacAssociationRole &macAssociationRole) {
+    LSRolesMask roleMask;
+    switch (macAssociationRole) {
+        case MacAssociationRole::Viewer:
+            roleMask = kLSRolesViewer;
+            break;
+        case MacAssociationRole::Editor:
+            roleMask = kLSRolesEditor;
+            break;
+        case MacAssociationRole::Shell:
+            roleMask = kLSRolesShell;
+            break;
+        /*
+        case MacAssociationRole::All:
+            roleMask = kLSRolesAll;
+            break;
+        case MacAssociationRole::None:
+            roleMask = kLSRolesNone;
+            break;
+        */
+    }
+    return roleMask;
+}

@@ -15,6 +15,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 #import <AppKit/AppKit.h>
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
+#import <Foundation/NSString.h>
 #import <CoreServices/CoreServices.h>
 #include <string>
 #include <optional>
@@ -27,5 +28,7 @@ namespace Andromeda::Entanglement {
         static NSString* currentBundleIdentifier();
         static LSRolesMask macAssociationRoles2LsRoleMask(const MacAssociationRoles &roles);
         static MacAssociationRoles lsRoleMask2macAssociationRoles(const LSRolesMask &lsRoleMask);
+        static MacAssociationRole lsRoleMask2macAssociationRole(const LSRolesMask &lsRoleMask);
+        static LSRolesMask macAssociationRole2LsRoleMask(const MacAssociationRole &macAssociationRole);
     };
 }
