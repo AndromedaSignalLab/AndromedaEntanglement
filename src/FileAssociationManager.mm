@@ -589,3 +589,43 @@ NSString* bundleIdentifier =
 
     return status == noErr;
 }
+        bool associate();
+
+bool Andromeda::Entanglement::FileAssociationManager::associate(const MacFileAssociationRequest& fileAssociationRequest) {
+    if (fileAssociationRequest.bundleIdentifier.empty())
+    {
+        return false;
+    }
+
+    if (fileAssociationRequest.uti.empty())
+    {
+        return false;
+    }
+
+    //NSString* bundleIdentifier = [[NSBundle mainBundle]
+    // bundleIdentifier];
+
+    NSString* bundleIdentifier =
+        [NSString stringWithUTF8String:
+            fileAssociationRequest
+                .bundleIdentifier
+            .c_str()];
+
+    NSString* uti =
+        [NSString stringWithUTF8String:
+            fileAssociationRequest
+                .uti
+                .c_str()];
+
+    LSRolesMask roleMask = MacFileAssociationUtil::macAssociationRole2LsRoleMask(fileAssociationRequest.associationRole);
+
+    //https://github.com/ghostty-org/ghostty/discussions/8111
+    //https://developer.apple.com/documentation/appkit/nsworkspace/setdefaultapplication(at:toopen:completion:)
+    OSStatus status =
+        LSSetDefaultRoleHandlerForContentType(
+            (__bridge CFStringRef)uti,
+            roleMask,
+            (__bridge CFStringRef)bundleIdentifier);
+
+    return status == noErr;
+}

@@ -15,14 +15,16 @@ You should have received a copy of the GNU Lesser General Public License along w
 namespace Andromeda::Entanglement {
     class FileAssociationManager {
     public:
-        std::vector<FileAssociation> queryAssociations(const std::vector<std::string>& extensions);
+        static std::vector<FileAssociation> queryAssociations(const std::vector<std::string>& extensions);
 
-        std::vector<FileAssociation> queryAssociations(const std::vector<std::string>& extensions, const MacAssociationRole &macAssociationRole);
+        static std::vector<FileAssociation> queryAssociations(const std::vector<std::string>& extensions, const MacAssociationRole &macAssociationRole);
 
-        FileAssociation queryAssociation(const std::string& extension, const MacAssociationRole &macAssociationRole);
+        static FileAssociation queryAssociation(const std::string& extension, const MacAssociationRole &macAssociationRole);
 
-        bool associate(const FileAssociation& fileAssociation);
+        static bool associate(const FileAssociation& fileAssociation);
 
-        bool unassociate(const std::string& extension);
+        static bool associate(const MacFileAssociationRequest& fileAssociationRequest);
+
+        static bool unassociate(const std::string& extension);
     };
 }

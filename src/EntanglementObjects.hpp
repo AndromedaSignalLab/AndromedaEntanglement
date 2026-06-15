@@ -88,4 +88,13 @@ namespace Andromeda::Entanglement {
         std::optional<WindowsAssociationDetails> windowsDetails;
         std::optional<LinuxAssociationDetails> linuxDetails;
     };
+
+
+    struct FileAssociationRequest {
+        std::string extension;
+    };
+
+    struct MacFileAssociationRequest : FileAssociationRequest, MacAssociationDetails {
+    };
+
 }
