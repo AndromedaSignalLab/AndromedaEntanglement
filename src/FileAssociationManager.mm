@@ -25,10 +25,10 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
 {
     std::vector<FileAssociation> result;
 
-    for (const std::string & ext : extensions)
+    for (const std::string & extension : extensions)
     {
         for(const MacAssociationRole & macAssociationRole : MacAssociationRolesList) {
-        FileAssociation association = queryAssociation(ext, macAssociationRole);
+        FileAssociation association = queryAssociation(extension, macAssociationRole);
         if(association.associated)
             result.push_back(std::move(association));
         }
@@ -43,11 +43,24 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
 {
     std::vector<FileAssociation> result;
 
-    for (const auto& ext : extensions)
+    for (const std::string & extension : extensions)
     {
-        FileAssociation association = queryAssociation(ext, macAssociationRole);
+        FileAssociation association = queryAssociation(extension, macAssociationRole);
         if(association.associated)
             result.push_back(std::move(association));
+    }
+
+    return result;
+}
+
+std::vector<Andromeda::Entanglement::FileAssociation>
+Andromeda::Entanglement::FileAssociationManager::queryAssociation(const std::string& extension) {
+    std::vector<Andromeda::Entanglement::FileAssociation> result;
+
+    for(const MacAssociationRole & macAssociationRole : MacAssociationRolesList) {
+    FileAssociation association = queryAssociation(extension, macAssociationRole);
+    if(association.associated)
+        result.push_back(std::move(association));
     }
 
     return result;

@@ -21,6 +21,8 @@ namespace Andromeda::Entanglement {
 
         static FileAssociation queryAssociation(const std::string& extension, const MacAssociationRole &macAssociationRole);
 
+        static std::vector<FileAssociation> queryAssociation(const std::string& extension);
+
         static bool associate(const FileAssociation& fileAssociation);
 
         static bool associate(const MacFileAssociationRequest& fileAssociationRequest);
