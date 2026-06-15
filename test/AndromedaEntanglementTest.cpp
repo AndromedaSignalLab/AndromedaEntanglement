@@ -14,9 +14,41 @@ You should have received a copy of the GNU Lesser General Public License along w
 #include "../src/FileAssociationManager.hpp"
 
 using namespace Andromeda::Entanglement;
+
+void testMacAssociationRole() {
+    std::string extension = "mp4";
+    //std::string extension = "mod";
+    auto editor = FileAssociationManager::queryAssociation(extension, MacAssociationRole::Editor);
+    auto viewer = FileAssociationManager::queryAssociation(extension, MacAssociationRole::Viewer);
+
+}
+
+void testAssociationRequestForMac() {
+    MacFileAssociationRequest associationRequest;
+    associationRequest.associationRole= MacAssociationRole::Viewer;
+    associationRequest.extension = "mod";
+    associationRequest.uti = "com.firecore.fileformat.mod";
+    associationRequest.bundleIdentifier = "org.ModPlug.ModPlugPlayer";
+    FileAssociationManager::associate(associationRequest);
+}
+
+void testMultipleExtensionQuery() {
+    auto a = FileAssociationManager::queryAssociations({"zip", "mp4", "mod", "foo-bar"});
+
+    auto associations =
+    FileAssociationManager::queryAssociations(
+    {
+        "mod"
+    });
+}
+
 int main() {
     std::cout << "AndromedaEntanglementTest" << std::endl;
-    FileAssociationManager manager;
-    auto a = manager.queryAssociations({"zip", "mp4", "goo"});
+
+    //testMacAssociationRole();
+    //testAssociationRequestForMac();
+    //testMultipleExtensionQuery();
+
+
     return 0;
 }
