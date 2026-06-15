@@ -25,12 +25,6 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
 {
     std::vector<FileAssociation> result;
 
-    NSString* currentBundleId =
-        [[NSBundle mainBundle] bundleIdentifier];
-
-    NSWorkspace* workspace =
-        [NSWorkspace sharedWorkspace];
-
     for (const std::string & ext : extensions)
     {
         for(const MacAssociationRole & macAssociationRole : MacAssociationRolesList) {
@@ -48,14 +42,6 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociations(
     const std::vector<std::string>& extensions, const MacAssociationRole &macAssociationRole)
 {
     std::vector<FileAssociation> result;
-
-    LSRolesMask roleMask = MacFileAssociationUtil::macAssociationRole2LsRoleMask(macAssociationRole);
-
-    NSString* currentBundleId =
-        [[NSBundle mainBundle] bundleIdentifier];
-
-    NSWorkspace* workspace =
-        [NSWorkspace sharedWorkspace];
 
     for (const auto& ext : extensions)
     {
@@ -100,97 +86,100 @@ Andromeda::Entanglement::FileAssociationManager::queryAssociation(const std::str
         uti,
         roleMask);
 
-    if (handler) {
-        association.associated = true;
-        association.macDetails.emplace();
-        association.macDetails->uti = [(NSString*)uti UTF8String];
+    if(!handler) {
+        CFRelease(uti);
+        return association;
+    }
 
-        NSString* handlerBundleId =
-            (__bridge NSString*)handler;
+    association.associated = true;
+    association.macDetails.emplace();
+    association.macDetails->uti = [(NSString*)uti UTF8String];
 
-        association.macDetails->bundleIdentifier =
-            [handlerBundleId UTF8String];
+    NSString* handlerBundleId =
+        (__bridge NSString*)handler;
 
-        association.handledByCurrentApplication =
-            [handlerBundleId isEqualToString:
-                currentBundleId];
+    association.macDetails->bundleIdentifier =
+        [handlerBundleId UTF8String];
 
-        NSURL* appUrl =
-            [workspace
-                URLForApplicationWithBundleIdentifier:
-                    handlerBundleId];
+    association.handledByCurrentApplication =
+        [handlerBundleId isEqualToString:
+            currentBundleId];
 
-        if (appUrl) {
-            NSBundle* appBundle =
-                [NSBundle bundleWithURL:
-                    appUrl];
+    NSURL* appUrl =
+        [workspace
+            URLForApplicationWithBundleIdentifier:
+                handlerBundleId];
 
-            NSString* appName =
-                [appBundle
-                    objectForInfoDictionaryKey:
-                        @"CFBundleName"];
+    if (appUrl) {
+        NSBundle* appBundle =
+            [NSBundle bundleWithURL:
+                appUrl];
 
-            if (appName) {
-                association.applicationInfo.applicationName =
-                    [appName UTF8String];
-            }
+        NSString* appName =
+            [appBundle
+                objectForInfoDictionaryKey:
+                    @"CFBundleName"];
 
-            association.macDetails->associationRole = MacFileAssociationUtil::queryRoleFromBundle(appBundle, nsExt, uti);
+        if (appName) {
+            association.applicationInfo.applicationName =
+                [appName UTF8String];
+        }
 
-            if(association.macDetails->associationRole != macAssociationRole) {
-                association.associated = false;
-                association.macDetails.reset();
-                CFRelease(handler);
-                CFRelease(uti);
-                return association;
-            }
+        association.macDetails->associationRole = MacFileAssociationUtil::queryRoleFromBundle(appBundle, nsExt, uti);
 
+        if(association.macDetails->associationRole != macAssociationRole) {
+            association.associated = false;
+            association.macDetails.reset();
+            CFRelease(handler);
+            CFRelease(uti);
+            return association;
+        }
+
+        //
+        // Document icon from Info.plist
+        //
+        auto documentIcon =
+            MacFileAssociationUtil::queryDocumentIcon(
+                appBundle,
+                nsExt);
+
+        if (documentIcon)
+        {
+            association.fileTypeInfo.iconInfo =
+                *documentIcon;
+        }
+        else
+        {
             //
-            // Document icon from Info.plist
+            // Fallback icon from NSWorkspace
             //
-            auto documentIcon =
-                MacFileAssociationUtil::queryDocumentIcon(
-                    appBundle,
-                    nsExt);
+            NSImage* icon =
+                [workspace
+                    iconForFileType:
+                        nsExt];
 
-            if (documentIcon)
+            if (icon)
             {
-                association.fileTypeInfo.iconInfo =
-                    *documentIcon;
-            }
-            else
-            {
-                //
-                // Fallback icon from NSWorkspace
-                //
-                NSImage* icon =
-                    [workspace
-                        iconForFileType:
-                            nsExt];
+                association.fileTypeInfo.iconInfo.iconSource =
+                    IconSource::BinaryData;
 
-                if (icon)
+                NSData* tiffData =
+                    [icon TIFFRepresentation];
+
+                if (tiffData)
                 {
-                    association.fileTypeInfo.iconInfo.iconSource =
-                        IconSource::BinaryData;
+                    const std::byte* bytes =
+                        reinterpret_cast<
+                            const std::byte*>(
+                                [tiffData bytes]);
 
-                    NSData* tiffData =
-                        [icon TIFFRepresentation];
-
-                    if (tiffData)
-                    {
-                        const std::byte* bytes =
-                            reinterpret_cast<
-                                const std::byte*>(
-                                    [tiffData bytes]);
-
-                        association.fileTypeInfo
-                            .iconInfo
-                            .iconData
-                            .assign(
-                                bytes,
-                                bytes +
-                                [tiffData length]);
-                    }
+                    association.fileTypeInfo
+                        .iconInfo
+                        .iconData
+                        .assign(
+                            bytes,
+                            bytes +
+                            [tiffData length]);
                 }
             }
         }
@@ -275,7 +264,6 @@ NSString* bundleIdentifier =
 
     return status == noErr;
 }
-        bool associate();
 
 bool Andromeda::Entanglement::FileAssociationManager::associate(const MacFileAssociationRequest& fileAssociationRequest) {
     if (fileAssociationRequest.bundleIdentifier.empty())

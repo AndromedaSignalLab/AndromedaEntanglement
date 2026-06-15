@@ -33,13 +33,8 @@ void testAssociationRequestForMac() {
 }
 
 void testMultipleExtensionQuery() {
-    auto a = FileAssociationManager::queryAssociations({"zip", "mp4", "mod", "foo-bar"});
-
-    auto associations =
-    FileAssociationManager::queryAssociations(
-    {
-        "mod"
-    });
+    auto associations = FileAssociationManager::queryAssociations({"zip", "mp4", "mod", "foo-bar"});
+    auto associations2 = FileAssociationManager::queryAssociations({"mod"});
 }
 
 int main() {
@@ -47,8 +42,7 @@ int main() {
 
     //testMacAssociationRole();
     //testAssociationRequestForMac();
-    //testMultipleExtensionQuery();
-
+    testMultipleExtensionQuery();
 
     return 0;
 }
