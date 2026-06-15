@@ -31,31 +31,32 @@ namespace Andromeda::Entanglement {
         //All = (unsigned int) 0xFFFFFFFF
     };
 
-    struct MacAssociationDetails
-    {
+    inline constexpr std::array MacAssociationRolesList {
+        MacAssociationRole::Viewer,
+        MacAssociationRole::Editor,
+        MacAssociationRole::Shell
+    };
+
+    struct MacAssociationDetails {
         std::string uti;
         MacAssociationRole associationRole;
         std::string bundleIdentifier;
     };
 
-    struct WindowsAssociationDetails
-    {
+    struct WindowsAssociationDetails {
         std::string progId;
         std::string perceivedType;
     };
 
-    struct LinuxAssociationDetails
-    {
+    struct LinuxAssociationDetails {
         std::string desktopFile;
     };
 
-    struct ApplicationInfo
-    {
+    struct ApplicationInfo {
         std::string applicationName;
     };
 
-    enum class IconSource
-    {
+    enum class IconSource {
         None,
         FilePath,
         BinaryData
@@ -68,16 +69,14 @@ namespace Andromeda::Entanglement {
         std::vector<std::byte> iconData;
     };
 
-    struct FileTypeInfo
-    {
+    struct FileTypeInfo {
         std::string extension;
         std::string mimeType;
         std::string description;
         IconInfo iconInfo;
     };
 
-    struct FileAssociation
-    {
+    struct FileAssociation {
         ApplicationInfo applicationInfo;
         FileTypeInfo fileTypeInfo;
 
@@ -88,7 +87,6 @@ namespace Andromeda::Entanglement {
         std::optional<WindowsAssociationDetails> windowsDetails;
         std::optional<LinuxAssociationDetails> linuxDetails;
     };
-
 
     struct FileAssociationRequest {
         std::string extension;
