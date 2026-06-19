@@ -15,6 +15,23 @@ endif()
 enable_language(C)
 set(CMAKE_CXX_STANDARD 20)
 
+if(LINUX)
+    file(GLOB OSSpecificSrc
+            "./src/OSSpecific/Linux/*.hpp"
+            "./src/OSSpecific/Linux/*.cpp"
+)
+elseif(APPLE)
+    file(GLOB OSSpecificSrc
+            "./src/OSSpecific/macOS/*.hpp"
+            "./src/OSSpecific/macOS/*.cpp"
+            "./src/OSSpecific/macOS/*.mm"
+)
+elseif(WIN32)
+    file(GLOB OSSpecificSrc
+            "./src/OSSpecific/Windows/*.hpp"
+            "./src/OSSpecific/Windows/*.cpp"
+)
+endif()
 
 find_library(FOUNDATION_FRAMEWORK Foundation)
 find_library(APPKIT_FRAMEWORK AppKit)
@@ -24,10 +41,6 @@ find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
 file(GLOB AndromedaEntanglementSrc
     "../src/*.hpp"
     "../src/*.cpp"
-    "../src/*.mm"
-    "../src/Utils/*.hpp"
-    "../src/Utils/*.cpp"
-    "../src/Utils/*.mm"
 )
 
 file(GLOB AndromedaEntanglementTestSrc
@@ -43,6 +56,7 @@ endif()
 add_executable(AndromedaEntanglementTest
         ${AndromedaEntanglementTestSrc}
         ${AndromedaEntanglementSrc}
+        ${OSSpecificSrc}
 )
 
 target_link_libraries(

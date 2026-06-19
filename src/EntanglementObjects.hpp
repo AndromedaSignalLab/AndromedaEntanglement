@@ -31,6 +31,11 @@ namespace Andromeda::Entanglement {
         //All = (unsigned int) 0xFFFFFFFF
     };
 
+    enum class AssociationScope {
+        CurrentUser,
+        System
+    };
+
     inline constexpr std::array MacAssociationRolesList {
         MacAssociationRole::Viewer,
         MacAssociationRole::Editor,
@@ -45,7 +50,9 @@ namespace Andromeda::Entanglement {
 
     struct WindowsAssociationDetails {
         std::string progId;
-        std::string perceivedType;
+        std::string applicationId;
+        std::string executablePath;
+        AssociationScope scope;
     };
 
     struct LinuxAssociationDetails {

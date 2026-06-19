@@ -1,5 +1,5 @@
 /*
-MacUtils Objective-C class definitions of Andromeda Entanglement Project
+MacFileAssociationUtil class definitions of Andromeda Entanglement Project
 Copyright (C) 2026 Volkan Orhan
 
 This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
@@ -11,9 +11,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 #include <vector>
 #include "MacFileAssociationUtil.hpp"
 
-
-std::string
-Andromeda::Entanglement::MacFileAssociationUtil::queryDescription(CFStringRef uti) {
+std::string Andromeda::Entanglement::MacFileAssociationUtil::queryDescription(CFStringRef uti) {
     CFDictionaryRef declaration =
         UTTypeCopyDeclaration(uti);
 
