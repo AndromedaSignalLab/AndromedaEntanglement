@@ -7,7 +7,7 @@
 
 #You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 project("Andromeda Entanglement Test")
 if(APPLE)
     enable_language(OBJCXX)
@@ -19,24 +19,30 @@ if(LINUX)
     file(GLOB OSSpecificSrc
             "./src/OSSpecific/Linux/*.hpp"
             "./src/OSSpecific/Linux/*.cpp"
-)
+    )
 elseif(APPLE)
     file(GLOB OSSpecificSrc
             "./src/OSSpecific/macOS/*.hpp"
             "./src/OSSpecific/macOS/*.cpp"
             "./src/OSSpecific/macOS/*.mm"
-)
+    )
+    find_library(FOUNDATION_FRAMEWORK Foundation)
+    find_library(APPKIT_FRAMEWORK AppKit)
+    find_library(CORESERVICES_FRAMEWORK CoreServices)
+    find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
+
+    message(STATUS "Foundation: ${FOUNDATION_FRAMEWORK}")
+    message(STATUS "AppKit: ${APPKIT_FRAMEWORK}")
+    message(STATUS "CoreServices: ${CORESERVICES_FRAMEWORK}")
+    message(STATUS "CoreFoundation: ${COREFOUNDATION_FRAMEWORK}")
 elseif(WIN32)
     file(GLOB OSSpecificSrc
             "./src/OSSpecific/Windows/*.hpp"
             "./src/OSSpecific/Windows/*.cpp"
-)
+    )
 endif()
 
-find_library(FOUNDATION_FRAMEWORK Foundation)
-find_library(APPKIT_FRAMEWORK AppKit)
-find_library(CORESERVICES_FRAMEWORK CoreServices)
-find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
+
 
 file(GLOB AndromedaEntanglementSrc
     "../src/*.hpp"
@@ -59,6 +65,7 @@ add_executable(AndromedaEntanglementTest
         ${OSSpecificSrc}
 )
 
+if(APPLE)
 target_link_libraries(
         AndromedaEntanglementTest
         PRIVATE
@@ -67,8 +74,9 @@ target_link_libraries(
         ${CORESERVICES_FRAMEWORK}
         ${COREFOUNDATION_FRAMEWORK}
 )
-
-message(STATUS "Foundation: ${FOUNDATION_FRAMEWORK}")
-message(STATUS "AppKit: ${APPKIT_FRAMEWORK}")
-message(STATUS "CoreServices: ${CORESERVICES_FRAMEWORK}")
-message(STATUS "CoreFoundation: ${COREFOUNDATION_FRAMEWORK}")
+else()
+    target_link_libraries(
+            AndromedaEntanglementTest
+            PRIVATE
+    )
+endif()

@@ -25,6 +25,6 @@ if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
-add_library(DSP
+add_library(AndromedaEntanglement
     ${AndromedaEntanglementSrc}
 )

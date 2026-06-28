@@ -13,6 +13,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 #include <optional>
 #include <vector>
 #include <cstddef>
+#include <array>
 
 namespace Andromeda::Entanglement {
     struct MacAssociationRoles {
