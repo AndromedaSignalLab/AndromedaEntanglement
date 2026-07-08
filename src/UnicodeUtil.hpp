@@ -1,5 +1,5 @@
 /*
-FileAssociationManager class Windows specific definitions of Andromeda Entanglement Project
+UnicodeUtil class declarations of Andromeda Entanglement Project
 Copyright (C) 2026 Volkan Orhan
 
 This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
@@ -8,7 +8,13 @@ This library is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
-#include "FileAssociationManagerWindows.hpp"
+#pragma once
+#include <string>
 
-bool Andromeda::Entanglement::FileAssociationManagerWindows::unassociate(const std::string &extension) {
+namespace Andromeda::Entanglement {
+    class UnicodeUtil {
+        public:
+            static std::string wideToUtf8(const std::wstring&);
+            static std::wstring utf8ToWide(const std::string&);
+    };
 }

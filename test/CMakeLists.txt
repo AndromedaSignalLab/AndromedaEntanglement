@@ -17,14 +17,19 @@ set(CMAKE_CXX_STANDARD 20)
 
 if(LINUX)
     file(GLOB OSSpecificSrc
-            "./src/OSSpecific/Linux/*.hpp"
-            "./src/OSSpecific/Linux/*.cpp"
+            "../src/OSSpecific/Linux/*.hpp"
+            "../src/OSSpecific/Linux/*.cpp"
+            "OSSpecific/Linux/*.hpp"
+            "OSSpecific/Linux/*.cpp"
     )
 elseif(APPLE)
     file(GLOB OSSpecificSrc
-            "./src/OSSpecific/macOS/*.hpp"
-            "./src/OSSpecific/macOS/*.cpp"
-            "./src/OSSpecific/macOS/*.mm"
+            "../src/OSSpecific/macOS/*.hpp"
+            "../src/OSSpecific/macOS/*.cpp"
+            "../src/OSSpecific/macOS/*.mm"
+            "OSSpecific/macOS/*.hpp"
+            "OSSpecific/macOS/*.cpp"
+            "OSSpecific/macOS/*.mm"
     )
     find_library(FOUNDATION_FRAMEWORK Foundation)
     find_library(APPKIT_FRAMEWORK AppKit)
@@ -37,12 +42,16 @@ elseif(APPLE)
     message(STATUS "CoreFoundation: ${COREFOUNDATION_FRAMEWORK}")
 elseif(WIN32)
     file(GLOB OSSpecificSrc
-            "./src/OSSpecific/Windows/*.hpp"
-            "./src/OSSpecific/Windows/*.cpp"
+            "../src/OSSpecific/Windows/*.hpp"
+            "../src/OSSpecific/Windows/*.cpp"
+            "OSSpecific/Windows/*.hpp"
+            "OSSpecific/Windows/*.cpp"
     )
 endif()
 
-
+include_directories(../src/OSSpecific/macOS)
+include_directories(../src/OSSpecific/Linux)
+include_directories(../src/OSSpecific/Windows)
 
 file(GLOB AndromedaEntanglementSrc
     "../src/*.hpp"

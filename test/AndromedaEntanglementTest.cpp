@@ -12,6 +12,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 #include <iostream>
 #include "../src/AndromedaEntanglement.hpp"
 #include "../src/FileAssociationManager.hpp"
+#include "OSSpecific/Windows/WindowsTests.hpp"
 
 using namespace Andromeda::Entanglement;
 
@@ -23,12 +24,12 @@ void testOnMac() {
 }
 
 void testOnWindows() {
-
+    WindowsTests::testWindowsRegistryUtil();
 }
 
 int main() {
     std::cout << "AndromedaEntanglementTest" << std::endl;
-
+    testOnWindows();
 
     return 0;
 }

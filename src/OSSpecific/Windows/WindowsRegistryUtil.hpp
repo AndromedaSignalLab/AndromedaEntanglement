@@ -11,8 +11,25 @@ You should have received a copy of the GNU Lesser General Public License along w
 #pragma once
 
 #include <optional>
+#include <vector>
+#include <string>
+#include "../../EntanglementObjects.hpp"
 
-class WindowsRegistryUtil {
-    public:
-        static std::optional<std::string> getProgId(const std::string& extension);
-};
+struct HKEY__;
+using HKEY = HKEY__*;
+
+ namespace Andromeda::Entanglement {
+     class WindowsRegistryUtil {
+        public:
+            static std::optional<std::string> getProgId(const std::string& extension, const WindowsAssociationScope& scope);
+            static std::vector<WindowsProgIdInfo> getProgIds(const std::string& extension);
+            static std::optional<std::string> getUserChoiceProgId(const std::string& extension);
+            static std::optional<std::string> getCommand(const std::string& progId, const WindowsAssociationScope& scope, const WindowsVerb verb = WindowsVerb::Open);
+            //static getDefaultIcon();
+     private:
+            static HKEY getRootKey(const WindowsAssociationScope& scope);
+            static std::optional<std::wstring> readStringValue(HKEY rootKey, const std::wstring& subKey, const std::wstring& valueName = L"");
+            static std::wstring normalizeExtension(const std::string& extension);
+            static std::wstring verbToString(const WindowsVerb verb);
+     };
+ };
