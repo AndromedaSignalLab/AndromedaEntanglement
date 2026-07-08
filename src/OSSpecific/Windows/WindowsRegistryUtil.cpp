@@ -8,17 +8,19 @@ This library is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
+
 #include "WindowsRegistryUtil.hpp"
+
 #include <windows.h>
-#include <vector>
+
 #include <stdexcept>
-#include "../../../src/UnicodeUtil.hpp"
+#include <vector>
+
+#include <UnicodeUtil.hpp>
 
 using namespace Andromeda::Entanglement;
 
-std::vector<WindowsProgIdInfo>
-WindowsRegistryUtil::getProgIds(const std::string& extension)
-{
+std::vector<WindowsProgIdInfo> WindowsRegistryUtil::getProgIds(const std::string& extension) {
     std::vector<WindowsProgIdInfo> result;
 
     if (auto progId = getProgId(
@@ -44,14 +46,10 @@ WindowsRegistryUtil::getProgIds(const std::string& extension)
     return result;
 }
 
-HKEY Andromeda::Entanglement::WindowsRegistryUtil::getRootKey(
-    const WindowsAssociationScope& scope)
-{
-    switch (scope)
-    {
+HKEY WindowsRegistryUtil::getRootKey(const WindowsAssociationScope& scope) {
+    switch (scope) {
         case WindowsAssociationScope::CurrentUser:
             return HKEY_CURRENT_USER;
-
         case WindowsAssociationScope::AllUsers:
             return HKEY_LOCAL_MACHINE;
     }
@@ -59,11 +57,7 @@ HKEY Andromeda::Entanglement::WindowsRegistryUtil::getRootKey(
     return nullptr;
 }
 
-std::optional<std::string>
-Andromeda::Entanglement::WindowsRegistryUtil::getProgId(
-    const std::string& extension,
-    const WindowsAssociationScope& scope)
-{
+std::optional<std::string> WindowsRegistryUtil::getProgId(const std::string& extension, const WindowsAssociationScope& scope) {
     HKEY rootKey = getRootKey(scope);
 
     if (rootKey == nullptr)
@@ -81,15 +75,10 @@ Andromeda::Entanglement::WindowsRegistryUtil::getProgId(
     if (!progId)
         return std::nullopt;
 
-    return std::string(progId->begin(), progId->end());
+    return UnicodeUtil::wideToUtf8(*progId);
 }
 
-std::optional<std::wstring>
-WindowsRegistryUtil::readStringValue(
-    HKEY rootKey,
-    const std::wstring& subKey,
-    const std::wstring& valueName)
-{
+std::optional<std::wstring> WindowsRegistryUtil::readStringValue(HKEY rootKey, const std::wstring& subKey, const std::wstring& valueName) {
     HKEY hKey = nullptr;
 
     LONG result = RegOpenKeyExW(
@@ -137,9 +126,7 @@ WindowsRegistryUtil::readStringValue(
     return std::wstring(buffer.data());
 }
 
-std::wstring WindowsRegistryUtil::normalizeExtension(
-    const std::string& extension)
-{
+std::wstring WindowsRegistryUtil::normalizeExtension(const std::string& extension) {
     if (extension.empty())
         return {};
 
@@ -148,13 +135,10 @@ std::wstring WindowsRegistryUtil::normalizeExtension(
     if (ext.front() != '.')
         ext.insert(ext.begin(), '.');
 
-    return std::wstring(ext.begin(), ext.end());
+    return UnicodeUtil::utf8ToWide(ext);
 }
 
-std::optional<std::string>
-WindowsRegistryUtil::getUserChoiceProgId(
-    const std::string& extension)
-{
+std::optional<std::string> WindowsRegistryUtil::getUserChoiceProgId(const std::string& extension) {
     std::wstring ext = normalizeExtension(extension);
 
     if (ext.empty())
@@ -176,8 +160,7 @@ WindowsRegistryUtil::getUserChoiceProgId(
     return UnicodeUtil::wideToUtf8(*progId);
 }
 
-std::wstring WindowsRegistryUtil::verbToString(const WindowsVerb verb)
-{
+std::wstring WindowsRegistryUtil::verbToString(const WindowsVerb verb) {
     switch (verb)
     {
         case WindowsVerb::Open:
@@ -197,17 +180,13 @@ std::wstring WindowsRegistryUtil::verbToString(const WindowsVerb verb)
 
         case WindowsVerb::RunAs:
             return L"runas";
+
         default:
             throw std::invalid_argument("Unknown WindowsVerb.");
     }
 }
 
-std::optional<std::string>
-WindowsRegistryUtil::getCommand(
-    const std::string& progId,
-    const WindowsAssociationScope& scope,
-    const WindowsVerb verb)
-{
+std::optional<std::string> WindowsRegistryUtil::getCommand(const std::string& progId, const WindowsAssociationScope& scope, const WindowsVerb verb) {
     if (progId.empty())
         return std::nullopt;
 

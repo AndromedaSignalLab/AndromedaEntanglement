@@ -14,7 +14,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 #include <ostream>
 #include <WindowsRegistryUtil.hpp>
 
-#include "../../../src/EntanglementObjects.hpp"
+#include <EntanglementObjects.hpp>
 
 using namespace Andromeda::Entanglement;
 using namespace std;

@@ -49,6 +49,7 @@ elseif(WIN32)
     )
 endif()
 
+include_directories(../src)
 include_directories(../src/OSSpecific/macOS)
 include_directories(../src/OSSpecific/Linux)
 include_directories(../src/OSSpecific/Windows)
