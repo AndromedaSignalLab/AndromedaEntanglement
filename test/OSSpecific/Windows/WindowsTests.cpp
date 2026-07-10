@@ -16,6 +16,8 @@ You should have received a copy of the GNU Lesser General Public License along w
 
 #include <EntanglementObjects.hpp>
 
+#include "WindowsShellUtil.hpp"
+
 using namespace Andromeda::Entanglement;
 using namespace std;
 
@@ -53,6 +55,15 @@ void testCommand() {
     }
 }
 
+void testDefaultIcon() {
+    auto icon = WindowsRegistryUtil::getDefaultIcon("txtfilelegacy", WindowsAssociationScope::AllUsers);
+    if(icon)
+        std::cout << "Default icon for txt is " << icon->resourcePath << std::endl;
+    auto icon2 = WindowsShellUtil::getAssociatedIcon(".txt");
+    if(icon2)
+    cout<< icon2->resourcePath << std::endl;
+}
+
 void WindowsTests::testWindowsRegistryUtil() {
     //static std::vector<std::pair<WindowsAssociationScope, std::string>> ids = WindowsRegistryUtil::getProgIds(".txt");
     testProgId("txt");
@@ -64,5 +75,6 @@ void WindowsTests::testWindowsRegistryUtil() {
     testProgId("mod");
     testProgId("s3m");
     testCommand();
+    testDefaultIcon();
 }
 

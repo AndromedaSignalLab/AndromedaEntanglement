@@ -209,3 +209,50 @@ std::optional<std::string> WindowsRegistryUtil::getCommand(const std::string& pr
 
     return UnicodeUtil::wideToUtf8(*command);
 }
+
+std::optional<WindowsIconDetails> WindowsRegistryUtil::getDefaultIcon(const std::string& progId, const WindowsAssociationScope& scope) {
+    if (progId.empty())
+        return std::nullopt;
+
+    HKEY rootKey = getRootKey(scope);
+
+    if (rootKey == nullptr)
+        return std::nullopt;
+
+    std::wstring subKey =
+        L"Software\\Classes\\" +
+        UnicodeUtil::utf8ToWide(progId) +
+        L"\\DefaultIcon";
+
+    auto icon = readStringValue(rootKey, subKey);
+
+    if (!icon)
+        return std::nullopt;
+
+    return parseIconLocation(UnicodeUtil::wideToUtf8(*icon));
+}
+
+std::optional<WindowsIconDetails> WindowsRegistryUtil::parseIconLocation(const std::string& iconLocation) {
+    if (iconLocation.empty())
+        return std::nullopt;
+
+    auto separator = iconLocation.rfind(',');
+
+    WindowsIconDetails details;
+
+    if (separator == std::string::npos) {
+        details.resourcePath = iconLocation;
+        return details;
+    }
+
+    details.resourcePath = iconLocation.substr(0, separator);
+
+    try {
+        details.iconIdentifier = std::stoi(iconLocation.substr(separator + 1));
+    }
+    catch (...) {
+        return std::nullopt;
+    }
+
+    return details;
+}

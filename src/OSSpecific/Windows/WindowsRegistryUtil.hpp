@@ -25,11 +25,12 @@ using HKEY = HKEY__*;
             static std::vector<WindowsProgIdInfo> getProgIds(const std::string& extension);
             static std::optional<std::string> getUserChoiceProgId(const std::string& extension);
             static std::optional<std::string> getCommand(const std::string& progId, const WindowsAssociationScope& scope, const WindowsVerb verb = WindowsVerb::Open);
-            //static getDefaultIcon();
+            static std::optional<WindowsIconDetails> getDefaultIcon(const std::string& progId, const WindowsAssociationScope& scope);
      private:
             static HKEY getRootKey(const WindowsAssociationScope& scope);
             static std::optional<std::wstring> readStringValue(HKEY rootKey, const std::wstring& subKey, const std::wstring& valueName = L"");
             static std::wstring normalizeExtension(const std::string& extension);
             static std::wstring verbToString(const WindowsVerb verb);
+            static std::optional<WindowsIconDetails> parseIconLocation(const std::string& iconLocation);
      };
  };

@@ -70,11 +70,48 @@ namespace Andromeda::Entanglement {
         BinaryData
     };
 
+    /**
+     * Windows-specific icon resource information.
+     *
+     * This structure describes the location of an icon resource as represented
+     * by the Windows Shell and Registry.
+     *
+     * The icon resource is identified by the combination of a resource file
+     * (such as a DLL, EXE or ICL file) and an icon identifier.
+     */
+    struct WindowsIconDetails {
+        /**
+         * Path to the resource file containing the icon.
+         *
+         * This may refer to an executable, dynamic library or icon library,
+         * standalone icon file, or another file containing icon resources.
+         *
+         * Examples:
+         * - C:\Windows\System32\shell32.dll
+         * - C:\Program Files\Notepad++\notepad++.exe
+         * - C:\Icons\Text.ico
+         */
+        std::string resourcePath;
+
+        /**
+         * Windows icon identifier.
+         *
+         * - Non-negative values represent an icon index within the referenced file.
+         * - Negative values represent a Windows resource ID.
+         *
+         * Examples:
+         * - shell32.dll,-154 -> -154 (resource ID)
+         * - notepad++.exe,0  -> 0 (icon index)
+         */
+        int iconIdentifier = 0;
+    };
+
     struct IconInfo {
         IconSource iconSource = IconSource::None;
         std::optional<std::string> iconName;
         std::optional<std::string> iconPath;
         std::vector<std::byte> iconData;
+        std::optional<WindowsIconDetails> windowsDetails;
     };
 
     struct FileTypeInfo {

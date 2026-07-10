@@ -9,3 +9,46 @@ This library is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 #include "WindowsShellUtil.hpp"
+
+#include <windows.h>
+#include <shellapi.h>
+
+#include "UnicodeUtil.hpp"
+
+using namespace Andromeda::Entanglement;
+#include "WindowsShellUtil.hpp"
+
+#include <windows.h>
+#include <shellapi.h>
+
+#include "UnicodeUtil.hpp"
+
+using namespace Andromeda::Entanglement;
+
+std::optional<WindowsIconDetails> WindowsShellUtil::getAssociatedIcon(const std::string& extension) {
+    if (extension.empty())
+        return std::nullopt;
+
+    std::wstring ext = UnicodeUtil::utf8ToWide(extension);
+
+    if (ext.front() != L'.')
+        ext.insert(ext.begin(), L'.');
+
+    SHFILEINFOW shfi {};
+
+    if (!SHGetFileInfoW(
+            ext.c_str(),
+            FILE_ATTRIBUTE_NORMAL,
+            &shfi,
+            sizeof(shfi),
+            SHGFI_USEFILEATTRIBUTES | SHGFI_ICONLOCATION))
+    {
+        return std::nullopt;
+    }
+
+    WindowsIconDetails details;
+    details.resourcePath = UnicodeUtil::wideToUtf8(shfi.szDisplayName);
+    details.iconIdentifier = shfi.iIcon;
+
+    return details;
+}

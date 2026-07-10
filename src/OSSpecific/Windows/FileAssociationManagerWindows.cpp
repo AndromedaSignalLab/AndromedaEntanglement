@@ -11,4 +11,5 @@ You should have received a copy of the GNU Lesser General Public License along w
 #include "FileAssociationManagerWindows.hpp"
 
 bool Andromeda::Entanglement::FileAssociationManagerWindows::unassociate(const std::string &extension) {
+    return false;
 }
